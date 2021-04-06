@@ -16,20 +16,20 @@ export class Kin {
     this.app = express()
   }
 
-  async registerEventsHook(webhookSecret: string, callback: (e: any) => any) {
-    this.app.use('/kinTransactionEvents', express.json());
+  async registerEventsHook(webhookSecret: string, endpoint: string, callback: (e: any) => any) {
+    this.app.use(endpoint, express.json()); /*endpoint e.g. '/kinTransactionEvents'*/
     this.app.use(
-      '/kinTransactionEvents',
+      endpoint,
       EventsHandler((events) => {
         callback(events);
       }, webhookSecret)
     );
   }
 
-  async registerSignTxHook(webhookSecret: string, env: Environment, callback: (req: SignTransactionRequest, resp: SignTransactionResponse) => any) {
-    this.app.use('/signTransaction', express.json());
+  async registerSignTxHook(webhookSecret: string, endpoint: string, env: Environment, callback: (req: SignTransactionRequest, resp: SignTransactionResponse) => any) {
+    this.app.use(endpoint, express.json()); /*endpoint e.g. '/signTransaction'*/
     this.app.use(
-      '/signTransaction',
+      endpoint,
       SignTransactionHandler(
         env,
         (SignTransactionRequest, SignTransactionResponse) => {

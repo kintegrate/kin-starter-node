@@ -24,12 +24,12 @@ export async function main(): Promise<number> {
   }
 
   //listen for different events related to the app
-  kin.registerEventsHook('test', (event) => {
+  kin.registerEventsHook('test', 'kinTransactionEvents', (event) => {
     console.log('Event hook received', event);
   });
 
   //listen for transactions related to the app
-  kin.registerSignTxHook('test', Environment.Test, (req, res) => {
+  kin.registerSignTxHook('test', 'signTransaction', Environment.Test, (req, res) => {
     console.log('Sign tx hook received', req, res);
   });
 
