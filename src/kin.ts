@@ -1,14 +1,43 @@
 import { Client, Environment, kinToQuarks, PrivateKey, PublicKey, TransactionType } from '@kinecosystem/kin-sdk-v2'
+import { EventsHandler, SignTransactionHandler, SignTransactionRequest, SignTransactionResponse } from '@kinecosystem/kin-sdk-v2/dist/webhook';
+import express from 'express'
 
 export class Kin {
+
   static generateKey() {
     return PrivateKey.random()
   }
 
   readonly client: Client
+  readonly app: any;
 
   constructor(env: Environment, appIndex?: number) {
     this.client = new Client(env, { appIndex, kinVersion: 4 })
+    this.app = express()
+  }
+
+  async registerEventsHook(webhookSecret: string, callback: (e: any) => any) {
+    this.app.use('/kinTransactionEvents', express.json());
+    this.app.use(
+      '/kinTransactionEvents',
+      EventsHandler((events) => {
+        callback(events);
+      }, webhookSecret)
+    );
+  }
+
+  async registerSignTxHook(webhookSecret: string, env: Environment, callback: (req: SignTransactionRequest, resp: SignTransactionResponse) => any) {
+    this.app.use('/signTransaction', express.json());
+    this.app.use(
+      '/signTransaction',
+      SignTransactionHandler(
+        env,
+        (SignTransactionRequest, SignTransactionResponse) => {
+          callback(SignTransactionRequest, SignTransactionResponse);
+        },
+        webhookSecret
+      )
+    );
   }
 
   async createAccount(privateKey: PrivateKey): Promise<PublicKey[]> {

@@ -23,6 +23,16 @@ export async function main(): Promise<number> {
     console.log(`🗝  Token Account Bob   ${tokenAccount.toBase58()}`)
   }
 
+  //listen for different events related to the app
+  kin.registerEventsHook('test', (event) => {
+    console.log('Event hook received', event);
+  });
+
+  //listen for transactions related to the app
+  kin.registerSignTxHook('test', Environment.Test, (req, res) => {
+    console.log('Sign tx hook received', req, res);
+  });
+
   // Helper method to sleep a bit, then print balance of Alice and Bob
   async function sleepAndPrintBalances() {
     console.log('😴 Sleeping for a bit...')
